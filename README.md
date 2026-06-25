@@ -268,13 +268,7 @@ craft-your-career-backend/
 │   ├── ats-service/
 │   └── ai-service/
 ├── api-gateway/
-├── frontend-changes/              ← Drop these into your frontend project
-│   └── src/
-│       ├── lib/api.ts
-│       ├── contexts/{Auth,Resume}Context.tsx
-│       ├── pages/AuthPage.tsx
-│       ├── components/{ProtectedRoute,builder/ATS,builder/AI,landing/Navbar}.tsx
-│       └── hooks/useDownloadPDF.ts
+├─
 └── scripts/
     ├── dev-setup.sh
     ├── dev-start.sh
