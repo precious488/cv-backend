@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { authenticate } from '@craft/shared/src/middleware'
+import { authenticate } from '@craft/shared'
 import {
   getProfile,
   updateProfile,

@@ -5,9 +5,9 @@ import {
   cacheAside,
   invalidateCache,
   cacheKeys,
-} from '@craft/shared/src/utils/redis'
-import { AuthenticatedRequest } from '@craft/shared/src/types'
-import { logger } from '@craft/shared/src/utils/logger'
+} from '@craft/shared'
+import { AuthenticatedRequest } from '@craft/shared'
+import { logger } from '@craft/shared'
 import { v4 as uuidv4 } from 'uuid'
 
 const updateSchema = z.object({

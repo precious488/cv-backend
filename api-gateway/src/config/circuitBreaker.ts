@@ -1,5 +1,5 @@
 import CircuitBreaker from 'opossum'
-import { logger } from '@craft/shared/src/utils/logger'
+import { logger } from '@craft/shared'
 
 const DEFAULT_OPTIONS: CircuitBreaker.Options = {
   timeout: 10000, // 10s — if service takes longer, fail fast

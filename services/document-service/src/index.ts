@@ -7,9 +7,9 @@ import {
   requestLogger,
   globalErrorHandler,
   notFoundHandler,
-} from '@craft/shared/src/middleware'
-import { logger } from '@craft/shared/src/utils/logger'
-import { initBroker } from '@craft/shared/src/events/broker'
+} from '@craft/shared'
+import { logger } from '@craft/shared'
+import { initBroker } from '@craft/shared'
 import documentRoutes from './routes/document'
 
 const app = express()

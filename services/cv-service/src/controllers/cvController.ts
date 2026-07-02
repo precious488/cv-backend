@@ -6,10 +6,10 @@ import {
   invalidateCache,
   invalidateCachePattern,
   cacheKeys,
-} from '@craft/shared/src/utils/redis'
-import { publishEvent } from '@craft/shared/src/events/broker'
-import { logger } from '@craft/shared/src/utils/logger'
-import { AuthenticatedRequest } from '@craft/shared/src/types'
+} from '@craft/shared'
+import { publishEvent } from '@craft/shared'
+import { logger } from '@craft/shared'
+import { AuthenticatedRequest } from '@craft/shared'
 import { v4 as uuidv4 } from 'uuid'
 
 // ─── Validation ───────────────────────────────────────────────

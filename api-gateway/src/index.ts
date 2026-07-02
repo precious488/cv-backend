@@ -7,9 +7,9 @@ import {
   correlationIdMiddleware,
   requestLogger,
   notFoundHandler,
-} from '@craft/shared/src/middleware'
-import { logger } from '@craft/shared/src/utils/logger'
-import { getRedisClient } from '@craft/shared/src/utils/redis'
+} from '@craft/shared'
+import { logger } from '@craft/shared'
+import { getRedisClient } from '@craft/shared'
 import { getCircuitBreakerStats } from './config/circuitBreaker'
 import {
   authProxy,

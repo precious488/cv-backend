@@ -10,8 +10,8 @@
  */
 import nodemailer from 'nodemailer'
 import crypto from 'crypto'
-import { getRedisClient } from '@craft/shared/src/utils/redis'
-import { logger } from '@craft/shared/src/utils/logger'
+import { getRedisClient } from '@craft/shared'
+import { logger } from '@craft/shared'
 
 const OTP_TTL_SECONDS = 600 // 10 minutes
 const OTP_KEY_PREFIX = 'otp:'

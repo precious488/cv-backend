@@ -1,7 +1,7 @@
-import { subscribeToEvents } from '@craft/shared/src/events/broker'
+import { subscribeToEvents } from '@craft/shared'
 import { UserProfile } from '../models/UserProfile'
-import { logger } from '@craft/shared/src/utils/logger'
-import { BaseEvent, UserRegisteredPayload } from '@craft/shared/src/types'
+import { logger } from '@craft/shared'
+import { BaseEvent, UserRegisteredPayload } from '@craft/shared'
 
 export async function startProfileEventConsumer(): Promise<void> {
   await subscribeToEvents(

@@ -7,10 +7,10 @@ import {
   requestLogger,
   globalErrorHandler,
   notFoundHandler,
-} from '@craft/shared/src/middleware'
-import { logger } from '@craft/shared/src/utils/logger'
-import { getRedisClient } from '@craft/shared/src/utils/redis'
-import { initBroker } from '@craft/shared/src/events/broker'
+} from '@craft/shared'
+import { logger } from '@craft/shared'
+import { getRedisClient } from '@craft/shared'
+import { initBroker } from '@craft/shared'
 import cvRoutes from './routes/cv'
 import 'dotenv/config'
 

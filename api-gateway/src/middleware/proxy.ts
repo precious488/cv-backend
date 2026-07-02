@@ -1,7 +1,7 @@
 import { createProxyMiddleware, Options } from 'http-proxy-middleware'
 import { Request, Response, NextFunction, RequestHandler } from 'express'
 import { getCircuitBreaker } from '../config/circuitBreaker'
-import { logger } from '@craft/shared/src/utils/logger'
+import { logger } from '@craft/shared'
 
 interface ServiceConfig {
   name: string

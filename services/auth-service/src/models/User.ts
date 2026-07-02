@@ -57,7 +57,7 @@ userSchema.methods.comparePassword = async function (
 
 // Never expose password in JSON
 userSchema.set('toJSON', {
-  transform(_doc, ret) {
+  transform(_doc, ret: any) {
     delete ret.password
     delete ret.refreshTokens
     delete ret.passwordResetToken

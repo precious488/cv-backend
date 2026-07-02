@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import rateLimit from 'express-rate-limit'
-import { authenticate, requireRole } from '@craft/shared/src/middleware'
+import { authenticate, requireRole } from '@craft/shared'
 import {
   improveSummary,
   generateBulletPoints,

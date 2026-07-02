@@ -1,8 +1,8 @@
 import { Response } from 'express'
 import { z } from 'zod'
 import { scoreResume, hashJobDescription } from '../utils/atsEngine'
-import { cacheAside, cacheKeys } from '@craft/shared/src/utils/redis'
-import { AuthenticatedRequest } from '@craft/shared/src/types'
+import { cacheAside, cacheKeys } from '@craft/shared'
+import { AuthenticatedRequest } from '@craft/shared'
 import { v4 as uuidv4 } from 'uuid'
 
 const analyzeSchema = z.object({

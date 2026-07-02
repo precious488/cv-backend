@@ -1,7 +1,7 @@
 // ─── REPLACE services/user-profile-service/src/routes/feedback.ts entirely with this ───
 import { Router } from 'express'
 import rateLimit from 'express-rate-limit'
-import { authenticate, requireRole } from '@craft/shared/src/middleware'
+import { authenticate, requireRole } from '@craft/shared'
 import {
   submitFeedback,
   getMyFeedback,

@@ -1,9 +1,9 @@
 import { Response } from 'express'
 import Groq from 'groq-sdk'
 import { z } from 'zod'
-import { AuthenticatedRequest } from '@craft/shared/src/types'
-import { cacheAside } from '@craft/shared/src/utils/redis'
-import { logger } from '@craft/shared/src/utils/logger'
+import { AuthenticatedRequest } from '@craft/shared'
+import { cacheAside } from '@craft/shared'
+import { logger } from '@craft/shared'
 import crypto from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
 

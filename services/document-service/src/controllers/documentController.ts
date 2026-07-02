@@ -2,8 +2,8 @@ import { Response } from 'express'
 import puppeteer, { Browser } from 'puppeteer'
 import { z } from 'zod'
 import { renderTemplate, ResumeData } from '../templates/htmlTemplates'
-import { AuthenticatedRequest } from '../../../../shared/src/types'
-import { logger } from '../../../../shared/src/utils/logger'
+import { AuthenticatedRequest } from '@craft/shared'
+import { logger } from '@craft/shared'
 import { v4 as uuidv4 } from 'uuid'
 
 let browserInstance: Browser | null = null

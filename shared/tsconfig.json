@@ -1,27 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2020",
     "module": "commonjs",
-    "moduleResolution": "node10", // renamed from "node"; kept for CommonJS + explicit .js-less imports
-    "ignoreDeprecations": "6.0", // silences the TS5107 deprecation warning until you migrate
-
-    "lib": ["ES2022"],
-
-    "types": ["node"],
-
+    "lib": ["ES2020"],
+    "declaration": true,
     "outDir": "./dist",
     "rootDir": "./src",
-
+    // "ignoreDeprecations": "6.0",
     "strict": true,
     "esModuleInterop": true,
-
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true
+    "resolveJsonModule": true
+    // "moduleResolution": "node"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

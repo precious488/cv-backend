@@ -2,9 +2,9 @@ import { Request, Response } from 'express'
 import { z } from 'zod'
 import { User } from '../models/User'
 import { generateTokens, verifyRefreshToken } from '../utils/tokens'
-import { logger } from '@craft/shared/src/utils/logger'
-import { invalidateCache, cacheKeys } from '@craft/shared/src/utils/redis'
-import { publishEvent } from '@craft/shared/src/events/broker'
+import { logger } from '@craft/shared'
+import { invalidateCache, cacheKeys } from '@craft/shared'
+import { publishEvent } from '@craft/shared'
 import { v4 as uuidv4 } from 'uuid'
 import { AuthenticatedRequest } from '../types/shared'
 import { generateAndStoreOTP, sendOTPEmail, verifyOTP } from '../utils/otp'
@@ -479,13 +479,11 @@ export async function resetPassword(
   }
 
   if (!token || !newPassword) {
-    res
-      .status(400)
-      .json({
-        success: false,
-        error: 'Token and new password are required',
-        correlationId,
-      })
+    res.status(400).json({
+      success: false,
+      error: 'Token and new password are required',
+      correlationId,
+    })
     return
   }
 

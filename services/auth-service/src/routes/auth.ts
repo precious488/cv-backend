@@ -10,7 +10,7 @@
 //   toggleOtp,
 //   verifyOtp,
 // } from '../controllers/authController'
-// import { authenticate } from '@craft/shared/src/middleware'
+// import { authenticate } from '@craft/shared'
 
 // const router = Router()
 
@@ -66,7 +66,7 @@ import {
   forgotPassword,
   resetPassword,
 } from '../controllers/authController'
-import { authenticate } from '../../../../shared/src/middleware'
+import { authenticate } from '@craft/shared'
 
 const router = Router()
 

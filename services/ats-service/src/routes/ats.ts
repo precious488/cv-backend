@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import rateLimit from 'express-rate-limit'
-import { authenticate } from '@craft/shared/src/middleware'
+import { authenticate } from '@craft/shared'
 import { analyzeResume } from '../controllers/atsController'
 
 const router = Router()

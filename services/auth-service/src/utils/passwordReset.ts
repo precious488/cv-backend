@@ -4,8 +4,8 @@
  */
 import crypto from 'crypto'
 import nodemailer from 'nodemailer'
-import { getRedisClient } from '../../../../shared/src/utils/redis'
-import { logger } from '../../../../shared/src/utils/logger'
+import { getRedisClient } from '@craft/shared'
+import { logger } from '@craft/shared'
 
 const RESET_TTL_SECONDS = 900 // 15 minutes
 const RESET_KEY_PREFIX = 'pwd-reset:'

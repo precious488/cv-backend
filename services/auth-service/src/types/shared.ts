@@ -3,4 +3,4 @@ export type {
   JwtPayload,
   ApiResponse,
   AuthenticatedRequest,
-} from '@craft/shared/src/types'
+} from '@craft/shared'

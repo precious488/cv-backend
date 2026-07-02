@@ -2,8 +2,8 @@
 import { Response } from 'express'
 import { z } from 'zod'
 import { Feedback } from '../models/Feedback'
-import { AuthenticatedRequest } from '@craft/shared/src/types'
-import { logger } from '@craft/shared/src/utils/logger'
+import { AuthenticatedRequest } from '@craft/shared'
+import { logger } from '@craft/shared'
 import { v4 as uuidv4 } from 'uuid'
 
 const MAX_PHOTO_BYTES = 1_500_000

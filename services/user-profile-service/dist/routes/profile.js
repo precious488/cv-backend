@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const shared_1 = require("@craft/shared");
+const profileController_1 = require("../controllers/profileController");
+const router = (0, express_1.Router)();
+router.use(shared_1.authenticate);
+router.get('/me', profileController_1.getProfile);
+router.put('/me', profileController_1.updateProfile);
+router.delete('/me', profileController_1.deleteAccount);
+exports.default = router;

@@ -8,7 +8,7 @@ import {
   deleteResume,
   duplicateResume,
 } from '../controllers/cvController'
-import { authenticate } from '@craft/shared/src/middleware'
+import { authenticate } from '@craft/shared'
 
 const router = Router()
 
