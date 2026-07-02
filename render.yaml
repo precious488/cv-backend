@@ -1,0 +1,230 @@
+services:
+  # ─── API Gateway ──────────────────────────────────────────────
+  - type: web
+    name: craft-api-gateway
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm run build:gateway
+    startCommand: npm run start:gateway
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVICE_NAME
+        value: api-gateway
+      - key: PORT
+        value: 4000
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          name: craft-redis
+          type: redis
+          property: connectionString
+      - key: AUTH_SERVICE_URL
+        sync: false
+      - key: PROFILE_SERVICE_URL
+        sync: false
+      - key: CV_SERVICE_URL
+        sync: false
+      - key: DOCUMENT_SERVICE_URL
+        sync: false
+      - key: ATS_SERVICE_URL
+        sync: false
+      - key: AI_SERVICE_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+  # ─── Auth Service ─────────────────────────────────────────────
+  - type: web
+    name: craft-auth-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm run build:auth
+    startCommand: npm run start:auth
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVICE_NAME
+        value: auth-service
+      - key: PORT
+        value: 3001
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: JWT_ACCESS_EXPIRES
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES
+        value: 7d
+      - key: BCRYPT_ROUNDS
+        value: 12
+      - key: REDIS_URL
+        fromService:
+          name: craft-redis
+          type: redis
+          property: connectionString
+      - key: RABBITMQ_URL
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_SECURE
+        value: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+  # ─── User Profile Service ─────────────────────────────────────
+  - type: web
+    name: craft-profile-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm run build:profile
+    startCommand: npm run start:profile
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVICE_NAME
+        value: user-profile-service
+      - key: PORT
+        value: 3002
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          name: craft-redis
+          type: redis
+          property: connectionString
+      - key: RABBITMQ_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+  # ─── CV Service ───────────────────────────────────────────────
+  - type: web
+    name: craft-cv-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm run build:cv
+    startCommand: npm run start:cv
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVICE_NAME
+        value: cv-service
+      - key: PORT
+        value: 3003
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          name: craft-redis
+          type: redis
+          property: connectionString
+      - key: RABBITMQ_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+  # ─── Document Service ─────────────────────────────────────────
+  - type: web
+    name: craft-document-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm run build:document
+    startCommand: npm run start:document
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVICE_NAME
+        value: document-service
+      - key: PORT
+        value: 3004
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: RABBITMQ_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+  # ─── ATS Service ──────────────────────────────────────────────
+  - type: web
+    name: craft-ats-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm run build:ats
+    startCommand: npm run start:ats
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVICE_NAME
+        value: ats-service
+      - key: PORT
+        value: 3005
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          name: craft-redis
+          type: redis
+          property: connectionString
+      - key: FRONTEND_URL
+        sync: false
+
+  # ─── AI Service ───────────────────────────────────────────────
+  - type: web
+    name: craft-ai-service
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm run build:ai
+    startCommand: npm run start:ai
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVICE_NAME
+        value: ai-service
+      - key: PORT
+        value: 3006
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          name: craft-redis
+          type: redis
+          property: connectionString
+      - key: FRONTEND_URL
+        sync: false
+
+  # ─── Redis ────────────────────────────────────────────────────
+  - type: redis
+    name: craft-redis
+    region: oregon
+    plan: free
+    maxmemoryPolicy: allkeys-lru

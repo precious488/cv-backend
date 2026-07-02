@@ -104,10 +104,10 @@ body { background: #fff; }
   <h1>${esc(p.fullName) || 'Your Name'}</h1>
   <div class="job-title">${esc(p.title) || 'Professional Title'}</div>
   <div class="contact-row">
-    ${p.email ? `<span>✉ ${esc(p.email)}</span>` : ''}
-    ${p.phone ? `<span>📞 ${esc(p.phone)}</span>` : ''}
-    ${p.location ? `<span>📍 ${esc(p.location)}</span>` : ''}
-    ${p.website ? `<span>🌐 ${esc(p.website)}</span>` : ''}
+    ${p.email ? `<span> ${esc(p.email)}</span>` : ''}
+    ${p.phone ? `<span>${esc(p.phone)}</span>` : ''}
+    ${p.location ? `<span> ${esc(p.location)}</span>` : ''}
+    ${p.website ? `<span> ${esc(p.website)}</span>` : ''}
     ${p.linkedin ? `<span>in ${esc(p.linkedin)}</span>` : ''}
   </div>
 </div>
@@ -260,7 +260,8 @@ function minimalTemplate(d: ResumeData): string {
   return `<!DOCTYPE html><html><head><meta charset="utf-8">
 <style>
 ${BASE_CSS}
-body { padding: 36px 40px; background: #fff; max-width: 680px; }
+body { padding: 36px 40px; background: #fff; }
+.resume-wrapper { max-width: 680px; margin: 0 auto; }
 .header { margin-bottom: 24px; }
 .header h1 { font-size: 26px; font-weight: 300; letter-spacing: 0.02em; }
 .header .title { font-size: 13px; color: #888; margin-top: 2px; }
@@ -269,6 +270,7 @@ body { padding: 36px 40px; background: #fff; max-width: 680px; }
 .item-title { font-weight: 500; }
 .skill-tag { background: transparent; border: 1px solid #ddd; color: #555; }
 </style></head><body>
+<div class="resume-wrapper">
 <div class="header">
   <h1>${esc(p.fullName) || 'Your Name'}</h1>
   ${p.title ? `<div class="title">${esc(p.title)}</div>` : ''}
@@ -306,6 +308,7 @@ ${
     : ''
 }
 ${d.skills.length ? `<div class="section"><div class="section-title">Skills</div><div class="skills-list">${d.skills.map((s) => `<span class="skill-tag">${esc(s)}</span>`).join('')}</div></div>` : ''}
+</div>
 </body></html>`
 }
 
@@ -331,8 +334,8 @@ body { background: #fff; display: flex; min-height: 100vh; }
   <div class="title">${esc(p.title) || ''}</div>
   <div class="sidebar-section"><div class="sidebar-section-title">Contact</div>
     ${p.email ? `<p>✉ ${esc(p.email)}</p>` : ''}
-    ${p.phone ? `<p>📞 ${esc(p.phone)}</p>` : ''}
-    ${p.location ? `<p>📍 ${esc(p.location)}</p>` : ''}
+    ${p.phone ? `<p> ${esc(p.phone)}</p>` : ''}
+    ${p.location ? `<p> ${esc(p.location)}</p>` : ''}
     ${p.linkedin ? `<p>in ${esc(p.linkedin)}</p>` : ''}
   </div>
   ${d.skills.length ? `<div class="sidebar-section"><div class="sidebar-section-title">Skills</div>${d.skills.map((s) => `<p>• ${esc(s)}</p>`).join('')}</div>` : ''}

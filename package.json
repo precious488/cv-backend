@@ -1,0 +1,22 @@
+{
+  "name": "craft-your-career-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:shared": "cd shared && npm install && npm run build",
+    "build:auth": "npm run build:shared && cd services/auth-service && npm install && npm run build",
+    "build:profile": "npm run build:shared && cd services/user-profile-service && npm install && npm run build",
+    "build:cv": "npm run build:shared && cd services/cv-service && npm install && npm run build",
+    "build:document": "npm run build:shared && cd services/document-service && npm install && npm run build",
+    "build:ats": "npm run build:shared && cd services/ats-service && npm install && npm run build",
+    "build:ai": "npm run build:shared && cd services/ai-service && npm install && npm run build",
+    "build:gateway": "npm run build:shared && cd api-gateway && npm install && npm run build",
+    "start:auth": "cd services/auth-service && node dist/index.js",
+    "start:profile": "cd services/user-profile-service && node dist/index.js",
+    "start:cv": "cd services/cv-service && node dist/index.js",
+    "start:document": "cd services/document-service && node dist/index.js",
+    "start:ats": "cd services/ats-service && node dist/index.js",
+    "start:ai": "cd services/ai-service && node dist/index.js",
+    "start:gateway": "cd api-gateway && node dist/index.js"
+  }
+}
