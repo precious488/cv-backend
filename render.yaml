@@ -254,7 +254,7 @@ services:
     plan: free
     buildCommand: >
       cd shared && npm install && npm run build && cd ../api-gateway &&
-      npm install &&
+      npm install --include=dev &&
       mkdir -p node_modules/@craft/shared &&
       cp -r ../shared/dist node_modules/@craft/shared/dist &&
       cp -r ../shared/src node_modules/@craft/shared/src &&
@@ -299,7 +299,7 @@ services:
     plan: free
     buildCommand: >
       cd shared && npm install && npm run build && cd ../services/auth-service &&
-      npm install &&
+      npm install --include=dev &&
       mkdir -p node_modules/@craft/shared &&
       cp -r ../../shared/dist node_modules/@craft/shared/dist &&
       cp -r ../../shared/src node_modules/@craft/shared/src &&
@@ -354,7 +354,7 @@ services:
     plan: free
     buildCommand: >
       cd shared && npm install && npm run build && cd ../services/user-profile-service &&
-      npm install &&
+      npm install --include=dev &&
       mkdir -p node_modules/@craft/shared &&
       cp -r ../../shared/dist node_modules/@craft/shared/dist &&
       cp -r ../../shared/src node_modules/@craft/shared/src &&
@@ -391,7 +391,7 @@ services:
     plan: free
     buildCommand: >
       cd shared && npm install && npm run build && cd ../services/cv-service &&
-      npm install &&
+      npm install --include=dev &&
       mkdir -p node_modules/@craft/shared &&
       cp -r ../../shared/dist node_modules/@craft/shared/dist &&
       cp -r ../../shared/src node_modules/@craft/shared/src &&
@@ -428,7 +428,7 @@ services:
     plan: free
     buildCommand: >
       cd shared && npm install && npm run build && cd ../services/document-service &&
-      npm install &&
+      npm install --include=dev &&
       mkdir -p node_modules/@craft/shared &&
       cp -r ../../shared/dist node_modules/@craft/shared/dist &&
       cp -r ../../shared/src node_modules/@craft/shared/src &&
@@ -458,7 +458,7 @@ services:
     plan: free
     buildCommand: >
       cd shared && npm install && npm run build && cd ../services/ats-service &&
-      npm install &&
+      npm install --include=dev &&
       mkdir -p node_modules/@craft/shared &&
       cp -r ../../shared/dist node_modules/@craft/shared/dist &&
       cp -r ../../shared/src node_modules/@craft/shared/src &&
@@ -491,7 +491,7 @@ services:
     plan: free
     buildCommand: >
       cd shared && npm install && npm run build && cd ../services/ai-service &&
-      npm install &&
+      npm install --include=dev &&
       mkdir -p node_modules/@craft/shared &&
       cp -r ../../shared/dist node_modules/@craft/shared/dist &&
       cp -r ../../shared/src node_modules/@craft/shared/src &&
