@@ -31,6 +31,18 @@ app.get('/health', (_req, res) =>
 )
 app.use(notFoundHandler)
 app.use(globalErrorHandler)
+// Keep-alive ping every 14 minutes
+if (process.env.NODE_ENV === 'production') {
+  const GATEWAY_URL = process.env.RENDER_EXTERNAL_URL ?? ''
+  if (GATEWAY_URL) {
+    setInterval(
+      () => {
+        fetch(`${GATEWAY_URL}/health`).catch(() => {})
+      },
+      14 * 60 * 1000,
+    )
+  }
+}
 
 async function bootstrap(): Promise<void> {
   getRedisClient()
