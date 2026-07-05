@@ -434,9 +434,7 @@ services:
       cp -r ../../shared/dist node_modules/@craft/shared/dist &&
       cp -r ../../shared/src node_modules/@craft/shared/src &&
       cp ../../shared/package.json node_modules/@craft/shared/package.json &&
-      npm run build &&
-      node -e "const p = require('puppeteer'); p.executablePath();" ||
-      npx puppeteer browsers install chrome --path .cache/puppeteer
+      npm run build
     startCommand: cd services/document-service && node dist/index.js
     healthCheckPath: /health
     envVars:

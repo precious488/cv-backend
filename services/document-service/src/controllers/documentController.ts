@@ -26,11 +26,36 @@ let browserInstance: Browser | null = null
 // }
 async function getBrowser(): Promise<Browser> {
   if (!browserInstance || !browserInstance.connected) {
-    const execPath = process.env.PUPPETEER_EXECUTABLE_PATH
+    // Find chromium on the system
+    const possiblePaths = [
+      '/usr/bin/chromium',
+      '/usr/bin/chromium-browser',
+      '/usr/bin/google-chrome',
+      '/usr/bin/google-chrome-stable',
+      process.env.PUPPETEER_EXECUTABLE_PATH,
+    ].filter(Boolean) as string[]
+
+    let executablePath: string | undefined
+    for (const p of possiblePaths) {
+      try {
+        const fs = await import('fs')
+        if (fs.existsSync(p)) {
+          executablePath = p
+          break
+        }
+      } catch {}
+    }
+
+    // Fall back to puppeteer's own bundled chrome if nothing found
+    if (!executablePath) {
+      executablePath = puppeteer.executablePath()
+    }
+
+    logger.info({ executablePath }, 'Launching Puppeteer browser')
 
     browserInstance = await puppeteer.launch({
       headless: true,
-      executablePath: execPath || puppeteer.executablePath(),
+      executablePath,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
