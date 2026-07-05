@@ -8,23 +8,41 @@ import { v4 as uuidv4 } from 'uuid'
 
 let browserInstance: Browser | null = null
 
+// async function getBrowser(): Promise<Browser> {
+//   if (!browserInstance || !browserInstance.connected) {
+//     browserInstance = await puppeteer.launch({
+//       headless: true,
+//       executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+//       args: [
+//         '--no-sandbox',
+//         '--disable-setuid-sandbox',
+//         '--disable-dev-shm-usage',
+//         '--disable-gpu',
+//       ],
+//     })
+//     logger.info('Puppeteer browser launched')
+//   }
+//   return browserInstance
+// }
 async function getBrowser(): Promise<Browser> {
   if (!browserInstance || !browserInstance.connected) {
+    const execPath = process.env.PUPPETEER_EXECUTABLE_PATH
+
     browserInstance = await puppeteer.launch({
       headless: true,
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+      executablePath: execPath || puppeteer.executablePath(),
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
         '--disable-gpu',
+        '--disable-extensions',
       ],
     })
     logger.info('Puppeteer browser launched')
   }
   return browserInstance
 }
-
 const generateSchema = z.object({
   resumeData: z.object({}).passthrough(),
   format: z.enum(['pdf']).default('pdf'),

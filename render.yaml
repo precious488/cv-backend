@@ -427,14 +427,16 @@ services:
     region: oregon
     plan: free
     buildCommand: >
-      cd shared && npm install --include=dev && npm run build && cd ../services/document-service &&
+      cd shared && npm install --include=dev && npm run build &&
+      cd ../services/document-service &&
       npm install --include=dev &&
       mkdir -p node_modules/@craft/shared &&
       cp -r ../../shared/dist node_modules/@craft/shared/dist &&
       cp -r ../../shared/src node_modules/@craft/shared/src &&
       cp ../../shared/package.json node_modules/@craft/shared/package.json &&
-      npx puppeteer browsers install chrome &&
-      npm run build
+      npm run build &&
+      node -e "const p = require('puppeteer'); p.executablePath();" ||
+      npx puppeteer browsers install chrome --path .cache/puppeteer
     startCommand: cd services/document-service && node dist/index.js
     healthCheckPath: /health
     envVars:
