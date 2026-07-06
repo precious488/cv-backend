@@ -19,3 +19,4 @@ __exportStar(require("./utils/logger"), exports);
 __exportStar(require("./utils/redis"), exports);
 __exportStar(require("./events/broker"), exports);
 __exportStar(require("./middleware"), exports);
+__exportStar(require("./utils/email"), exports);

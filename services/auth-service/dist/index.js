@@ -54,6 +54,15 @@ async function bootstrap() {
     (0, shared_3.getRedisClient)();
     // RabbitMQ
     await (0, shared_4.initBroker)();
+    // Keep-alive ping every 14 minutes
+    if (process.env.NODE_ENV === 'production') {
+        const GATEWAY_URL = process.env.RENDER_EXTERNAL_URL ?? '';
+        if (GATEWAY_URL) {
+            setInterval(() => {
+                fetch(`${GATEWAY_URL}/health`).catch(() => { });
+            }, 14 * 60 * 1000);
+        }
+    }
     app.listen(PORT, () => {
         shared_2.logger.info({ port: PORT }, 'Auth service listening');
     });
