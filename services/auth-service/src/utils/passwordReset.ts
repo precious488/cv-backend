@@ -6,6 +6,7 @@ import crypto from 'crypto'
 import nodemailer from 'nodemailer'
 import { getRedisClient } from '@craft/shared'
 import { logger } from '@craft/shared'
+import SMTPTransport from 'nodemailer/lib/smtp-transport'
 
 const RESET_TTL_SECONDS = 900 // 15 minutes
 const RESET_KEY_PREFIX = 'pwd-reset:'
@@ -36,6 +37,7 @@ let _transporter: nodemailer.Transporter | null = null
 
 function getTransporter(): nodemailer.Transporter {
   if (_transporter) return _transporter
+
   _transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST ?? 'smtp.gmail.com',
     port: Number(process.env.SMTP_PORT ?? 587),
@@ -44,7 +46,9 @@ function getTransporter(): nodemailer.Transporter {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
-  })
+    family: 4,
+  } as SMTPTransport.Options)
+
   return _transporter
 }
 
