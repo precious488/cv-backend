@@ -1,24 +1,34 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
+
+# Copy shared library
 COPY shared/ ./shared/
 WORKDIR /app/shared
 RUN npm ci && npm run build
-WORKDIR /app/service
+
+# Copy service — note the extra /services/ nesting to match ../../shared
+WORKDIR /app/services/cv-service
 COPY services/cv-service/package*.json ./
 RUN npm ci
 COPY services/cv-service/ ./
 RUN npm run build
 
+# ─── Production image ─────────────────────────────────────────
 FROM node:20-alpine AS runner
 WORKDIR /app
+
 ENV NODE_ENV=production
 ENV SERVICE_NAME=cv-service
+
 RUN addgroup -g 1001 -S nodejs && adduser -S nodeuser -u 1001
-COPY --from=builder --chown=nodeuser:nodejs /app/service/dist ./dist
-COPY --from=builder --chown=nodeuser:nodejs /app/service/node_modules ./node_modules
-COPY --from=builder --chown=nodeuser:nodejs /app/service/package.json ./
+
+COPY --from=builder --chown=nodeuser:nodejs /app/services/cv-service/dist ./dist
+COPY --from=builder --chown=nodeuser:nodejs /app/services/cv-service/node_modules ./node_modules
+COPY --from=builder --chown=nodeuser:nodejs /app/services/cv-service/package.json ./
+
 USER nodeuser
 EXPOSE 3003
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
   CMD wget -qO- http://localhost:3003/health || exit 1
-CMD ["node", "dist/index.js"]
+
+CMD ["npm", "run", "start"]

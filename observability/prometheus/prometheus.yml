@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: local-dev
+
+scrape_configs:
+  # Prometheus scraping itself
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # OpenTelemetry Collector's own internal telemetry (health/throughput of
+  # the collector process itself - queue length, accepted/refused spans...)
+  - job_name: "otel-collector"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["otel-collector:8888"]
+
+  # Note: your applications' business metrics (request count, latency, etc.)
+  # do NOT get scraped here - they are pushed by the OTel Collector via its
+  # native OTLP exporter into Prometheus's OTLP receiver
+  # (/api/v1/otlp/v1/metrics), enabled by --web.enable-otlp-receiver.

@@ -1,0 +1,87 @@
+# =============================================================================
+# OpenTelemetry Collector configuration
+#
+# IMPORTANT: this file only uses components that ship in the *core*
+# otel/opentelemetry-collector image (otlp receiver, otlp/otlphttp exporters,
+# batch/memory_limiter processors, health_check extension). It deliberately
+# avoids the "prometheus" and "loki" exporters, which live in the -contrib
+# distribution and are NOT present in this image.
+#
+# Instead it relies on the fact that Tempo, Loki (3.x+) and Prometheus
+# (2.47+) all speak OTLP natively, so we push OTLP straight to each backend.
+# =============================================================================
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 200
+    spike_limit_mib: 50
+  batch:
+    timeout: 5s
+    send_batch_size: 1024
+
+exporters:
+  # Traces -> Tempo (native OTLP gRPC receiver)
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+  # Metrics -> Prometheus (native OTLP receiver, enabled via
+  # --web.enable-otlp-receiver in the prometheus service command)
+  otlphttp/prometheus:
+    endpoint: http://prometheus:9090/api/v1/otlp
+    tls:
+      insecure: true
+
+  # Logs -> Loki (native OTLP ingestion endpoint, Loki 3.x+)
+  otlphttp/loki:
+    endpoint: http://loki:3100/otlp
+    tls:
+      insecure: true
+
+  # Prints a summary of everything received to the collector's own stdout,
+  # handy for `docker compose logs -f otel-collector` while debugging.
+  debug:
+    verbosity: basic
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+service:
+  extensions: [health_check]
+
+  # Internal collector telemetry (queue sizes, accepted/refused spans, etc.)
+  # exposed in Prometheus text format on :8888 - no "prometheus" exporter
+  # component required for this, it's built into collector core.
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      level: detailed
+      address: 0.0.0.0:8888
+
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp/tempo, debug]
+
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlphttp/prometheus, debug]
+
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlphttp/loki, debug]

@@ -6,8 +6,8 @@ COPY shared/ ./shared/
 WORKDIR /app/shared
 RUN npm ci && npm run build
 
-# Copy service
-WORKDIR /app/service
+# Copy service — note the extra /services/ nesting to match ../../shared
+WORKDIR /app/services/auth-service
 COPY services/auth-service/package*.json ./
 RUN npm ci
 COPY services/auth-service/ ./
@@ -22,13 +22,13 @@ ENV SERVICE_NAME=auth-service
 
 RUN addgroup -g 1001 -S nodejs && adduser -S nodeuser -u 1001
 
-COPY --from=builder --chown=nodeuser:nodejs /app/service/dist ./dist
-COPY --from=builder --chown=nodeuser:nodejs /app/service/node_modules ./node_modules
-COPY --from=builder --chown=nodeuser:nodejs /app/service/package.json ./
+COPY --from=builder --chown=nodeuser:nodejs /app/services/auth-service/dist ./dist
+COPY --from=builder --chown=nodeuser:nodejs /app/services/auth-service/node_modules ./node_modules
+COPY --from=builder --chown=nodeuser:nodejs /app/services/auth-service/package.json ./
 
 USER nodeuser
 EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
   CMD wget -qO- http://localhost:3001/health || exit 1
 
-CMD ["node", "dist/index.js"]
+CMD ["npm", "run", "start"]
