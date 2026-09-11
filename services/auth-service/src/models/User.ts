@@ -10,9 +10,18 @@ export interface IUser extends Document {
   refreshTokens: string[]
   passwordResetToken?: string
   passwordResetExpires?: Date
+  isBlocked: boolean // ← add
+  blockedAt?: Date // ← add
+  blockedReason?: string
   otpEnabled: boolean
   createdAt: Date
   updatedAt: Date
+  failedLoginAttempts: number
+  lockedUntil?: Date
+  flagged: boolean
+  flagReason?: string
+  flaggedAt?: Date
+  registrationIp?: string
   comparePassword(candidate: string): Promise<boolean>
 }
 
@@ -34,6 +43,15 @@ const userSchema = new Schema<IUser>(
     passwordResetToken: { type: String, select: false },
     passwordResetExpires: { type: Date, select: false },
     otpEnabled: { type: Boolean, default: false },
+    failedLoginAttempts: { type: Number, default: 0 },
+    lockedUntil: { type: Date },
+    flagged: { type: Boolean, default: false, index: true },
+    flagReason: { type: String },
+    flaggedAt: { type: Date },
+    registrationIp: { type: String },
+    isBlocked: { type: Boolean, default: false, index: true }, // ← add
+    blockedAt: { type: Date }, // ← add
+    blockedReason: { type: String, trim: true },
   },
   {
     timestamps: true,

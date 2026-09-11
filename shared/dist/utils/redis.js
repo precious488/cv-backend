@@ -8,6 +8,7 @@ exports.getRedisClient = getRedisClient;
 exports.cacheAside = cacheAside;
 exports.invalidateCache = invalidateCache;
 exports.invalidateCachePattern = invalidateCachePattern;
+exports.incrementWithExpiry = incrementWithExpiry;
 const ioredis_1 = __importDefault(require("ioredis"));
 const logger_1 = require("./logger");
 let client = null;
@@ -91,3 +92,11 @@ exports.cacheKeys = {
     atsScore: (cvId, jobDescHash) => `ats:${cvId}:${jobDescHash}`,
     rateLimit: (ip, route) => `rl:${ip}:${route}`,
 };
+async function incrementWithExpiry(key, windowSeconds) {
+    const redis = getRedisClient();
+    const count = await redis.incr(key);
+    if (count === 1) {
+        await redis.expire(key, windowSeconds);
+    }
+    return count;
+}

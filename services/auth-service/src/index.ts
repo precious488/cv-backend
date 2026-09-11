@@ -14,8 +14,9 @@ import { logger } from '@craft/shared'
 import { getRedisClient } from '@craft/shared'
 import { initBroker } from '@craft/shared'
 import authRoutes from './routes/auth'
-
+import { startSecurityEventConsumer } from './middleware/securityEventConsumer' // ← add
 const app = express()
+app.set('trust proxy', 1)
 const PORT = process.env.PORT ?? 3001
 
 // ─── Security middleware ──────────────────────────────────────
@@ -64,6 +65,7 @@ async function bootstrap(): Promise<void> {
 
   // RabbitMQ
   await initBroker()
+  await startSecurityEventConsumer()
   // Keep-alive ping every 14 minutes
   if (process.env.NODE_ENV === 'production') {
     const GATEWAY_URL = process.env.RENDER_EXTERNAL_URL ?? ''

@@ -22,10 +22,14 @@ ENV SERVICE_NAME=ats-service
 
 RUN addgroup -g 1001 -S nodejs && adduser -S nodeuser -u 1001
 
-COPY --from=builder --chown=nodeuser:nodejs /app/services/ats-service/dist ./dist
-COPY --from=builder --chown=nodeuser:nodejs /app/services/ats-service/node_modules ./node_modules
-COPY --from=builder --chown=nodeuser:nodejs /app/services/ats-service/package.json ./
+# Replicate the SAME directory depth as the builder stage so the
+# @craft/shared symlink inside node_modules resolves correctly
+COPY --from=builder --chown=nodeuser:nodejs /app/shared /app/shared
+COPY --from=builder --chown=nodeuser:nodejs /app/services/ats-service/dist ./services/ats-service/dist
+COPY --from=builder --chown=nodeuser:nodejs /app/services/ats-service/node_modules ./services/ats-service/node_modules
+COPY --from=builder --chown=nodeuser:nodejs /app/services/ats-service/package.json ./services/ats-service/package.json
 
+WORKDIR /app/services/ats-service
 USER nodeuser
 EXPOSE 3005
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \

@@ -7,7 +7,7 @@ import { logger } from '@craft/shared'
 import crypto from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
 
-const MODEL = 'llama-3.1-8b-instant'
+const MODEL = 'openai/gpt-oss-20b'
 
 let groqClient: Groq | null = null
 function getGroq(): Groq {
@@ -35,6 +35,7 @@ async function callGroq(
     ],
     max_tokens: 400,
     temperature: 0.7,
+    reasoning_effort: 'low',
   })
   const text = completion.choices[0]?.message?.content?.trim() ?? ''
   return text.replace(/^["'"„""]+|["'"„""]+$/g, '').trim()
@@ -116,7 +117,13 @@ Generate ${numberOfPoints} bullet points:`
       const text = await callGroq(systemPrompt, userPrompt)
       return text
         .split('\n')
-        .filter((l: string) => l.trim().length > 10)
+        .map((l: string) =>
+          l
+            .trim()
+            .replace(/^(\d+[.)]\s*|[-*•]\s*)/, '')
+            .trim(),
+        )
+        .filter((l: string) => l.length > 10)
         .slice(0, numberOfPoints)
     },
     3600,

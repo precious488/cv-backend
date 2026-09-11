@@ -1,2 +1,2 @@
-import { initTelemetry } from '@craft/shared/src/telemetry/instrumentation'
+import { initTelemetry } from '@craft/shared/dist/telemetry/instrumentation'
 initTelemetry(process.env.SERVICE_NAME ?? 'auth-service')

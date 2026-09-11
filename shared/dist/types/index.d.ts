@@ -17,7 +17,7 @@ export interface ApiResponse<T = unknown> {
     message?: string;
     correlationId?: string;
 }
-export type EventType = 'user.registered' | 'user.deleted' | 'cv.created' | 'cv.updated' | 'cv.deleted' | 'document.generate.requested' | 'document.generate.completed' | 'document.generate.failed';
+export type EventType = 'user.registered' | 'user.deleted' | 'user.flagged' | 'cv.created' | 'cv.updated' | 'cv.deleted' | 'document.generate.requested' | 'document.generate.completed' | 'document.generate.failed';
 export interface BaseEvent<T = unknown> {
     eventType: EventType;
     correlationId: string;
@@ -41,4 +41,9 @@ export interface DocumentGeneratePayload {
     template: string;
     format: 'pdf' | 'docx';
     correlationId: string;
+}
+export interface UserFlaggedPayload {
+    userId: string;
+    reason: 'brute_force' | 'ai_abuse' | 'document_abuse' | 'malicious_input' | 'account_farming';
+    detail?: string;
 }

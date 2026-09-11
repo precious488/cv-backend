@@ -22,10 +22,14 @@ ENV SERVICE_NAME=user-profile-service
 
 RUN addgroup -g 1001 -S nodejs && adduser -S nodeuser -u 1001
 
-COPY --from=builder --chown=nodeuser:nodejs /app/services/user-profile-service/dist ./dist
-COPY --from=builder --chown=nodeuser:nodejs /app/services/user-profile-service/node_modules ./node_modules
-COPY --from=builder --chown=nodeuser:nodejs /app/services/user-profile-service/package.json ./
+# Replicate the SAME directory depth as the builder stage so the
+# @craft/shared symlink inside node_modules resolves correctly
+COPY --from=builder --chown=nodeuser:nodejs /app/shared /app/shared
+COPY --from=builder --chown=nodeuser:nodejs /app/services/user-profile-service/dist ./services/user-profile-service/dist
+COPY --from=builder --chown=nodeuser:nodejs /app/services/user-profile-service/node_modules ./services/user-profile-service/node_modules
+COPY --from=builder --chown=nodeuser:nodejs /app/services/user-profile-service/package.json ./services/user-profile-service/package.json
 
+WORKDIR /app/services/user-profile-service
 USER nodeuser
 EXPOSE 3002
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \

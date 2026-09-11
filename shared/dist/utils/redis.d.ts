@@ -17,3 +17,4 @@ export declare const cacheKeys: {
     atsScore: (cvId: string, jobDescHash: string) => string;
     rateLimit: (ip: string, route: string) => string;
 };
+export declare function incrementWithExpiry(key: string, windowSeconds: number): Promise<number>;

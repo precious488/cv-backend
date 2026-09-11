@@ -17,7 +17,7 @@
       "datasource": { "type": "tempo", "uid": "tempo" },
       "targets": [
         {
-          "queryType": "traceqlSearch",
+          "queryType": "traceql",
           "query": "{}",
           "datasource": { "type": "tempo", "uid": "tempo" }
         }

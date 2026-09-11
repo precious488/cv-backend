@@ -5,6 +5,8 @@ import { renderTemplate, ResumeData } from '../templates/htmlTemplates'
 import { AuthenticatedRequest } from '@craft/shared'
 import { logger } from '@craft/shared'
 import { v4 as uuidv4 } from 'uuid'
+import { containsSuspiciousMarkup } from '../utils/detectMaliciousInput'
+import { publishEvent } from '@craft/shared'
 
 let browserInstance: Browser | null = null
 
@@ -89,6 +91,20 @@ export async function generateDocument(
   }
 
   const resumeData = parsed.data.resumeData as unknown as ResumeData
+  if (containsSuspiciousMarkup(resumeData)) {
+    log.warn({ userId: req.user?.sub }, 'Suspicious markup in resume data')
+    await publishEvent({
+      eventType: 'user.flagged',
+      correlationId,
+      timestamp: new Date().toISOString(),
+      payload: {
+        userId: req.user!.sub,
+        reason: 'malicious_input',
+        detail: 'Script-like content submitted for PDF generation',
+      },
+    })
+    // Still rendered — esc() neutralizes it — but the account is now flagged for review
+  }
   log.info(
     { userId: req.user?.sub, template: resumeData.template },
     'Generating PDF',
@@ -97,6 +113,7 @@ export async function generateDocument(
   const html = renderTemplate(resumeData)
   const browser = await getBrowser()
   const page = await browser.newPage()
+  await page.setJavaScriptEnabled(false)
 
   try {
     await page.setContent(html, { waitUntil: 'networkidle0' })

@@ -31,10 +31,19 @@ app.use(
     crossOriginResourcePolicy: { policy: 'cross-origin' },
   }),
 )
+const allowedOrigins = (
+  process.env.FRONTEND_URLS ?? 'http://localhost:5173,http://localhost:8080'
+).split(',')
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:8080',
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'x-correlation-id'],
     exposedHeaders: ['x-correlation-id'],

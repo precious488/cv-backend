@@ -8,6 +8,7 @@ import { publishEvent } from '@craft/shared'
 import { v4 as uuidv4 } from 'uuid'
 import { AuthenticatedRequest } from '../types/shared'
 import { generateAndStoreOTP, sendOTPEmail, verifyOTP } from '../utils/otp'
+import { incrementWithExpiry } from '@craft/shared' // ← add to imports
 import {
   generateResetToken,
   verifyResetToken,
@@ -62,8 +63,32 @@ export async function register(req: Request, res: Response): Promise<void> {
     return
   }
 
-  const user = new User({ email, password, fullName })
+  const ip = req.ip ?? 'unknown'
+  const registrationsFromIp = await incrementWithExpiry(
+    `reg:ip:${ip}`,
+    24 * 60 * 60,
+  )
+  const isSuspicious = registrationsFromIp > 5
+
+  const user = new User({
+    email,
+    password,
+    fullName,
+    registrationIp: ip,
+    ...(isSuspicious && {
+      flagged: true,
+      flagReason: 'account_farming',
+      flaggedAt: new Date(),
+    }),
+  })
   await user.save()
+
+  if (isSuspicious) {
+    log.warn(
+      { userId: user.id, ip, registrationsFromIp },
+      'Registration flagged — possible account farming',
+    )
+  }
 
   const { accessToken, refreshToken } = generateTokens({
     sub: user.id,
@@ -119,10 +144,41 @@ export async function login(req: Request, res: Response): Promise<void> {
 
   const { email, password } = parsed.data
 
+  //
   const user = await User.findOne({ email }).select(
     '+password +refreshTokens +otpEnabled',
   )
+
+  // ─── Brute-force lockout check ─────────────────────────────
+  if (user?.lockedUntil && user.lockedUntil > new Date()) {
+    const minutesLeft = Math.ceil(
+      (user.lockedUntil.getTime() - Date.now()) / 60000,
+    )
+    res.status(423).json({
+      success: false,
+      error: `Account temporarily locked from repeated failed logins. Try again in ${minutesLeft} minute(s).`,
+      correlationId,
+    })
+    return
+  }
+
   if (!user || !(await user.comparePassword(password))) {
+    if (user) {
+      const attempts = (user.failedLoginAttempts ?? 0) + 1
+      const update: Record<string, unknown> = { failedLoginAttempts: attempts }
+      if (attempts >= 5) {
+        update.lockedUntil = new Date(Date.now() + 15 * 60 * 1000)
+        update.flagged = true
+        update.flagReason = 'brute_force'
+        update.flaggedAt = new Date()
+        update.failedLoginAttempts = 0
+        logger.warn(
+          { userId: user.id },
+          'Account auto-locked — brute-force threshold reached',
+        )
+      }
+      await User.findByIdAndUpdate(user.id, { $set: update })
+    }
     res.status(401).json({
       success: false,
       error: 'Invalid email or password',
@@ -130,6 +186,25 @@ export async function login(req: Request, res: Response): Promise<void> {
     })
     return
   }
+
+  // Reset counter on success
+  if (user.failedLoginAttempts) {
+    await User.findByIdAndUpdate(user.id, {
+      $set: { failedLoginAttempts: 0, lockedUntil: undefined },
+    })
+  }
+
+  // (isBlocked check from earlier goes here, unchanged)
+  if (user.isBlocked) {
+    res.status(403).json({
+      success: false,
+      error: 'This account has been blocked. Contact support for help.',
+      correlationId,
+    })
+    return
+  }
+
+  // ─── OTP check ──────────────────────────────────────────────
 
   // ─── OTP check ───────────────────────────────────────────────
   if (user.otpEnabled) {
@@ -533,6 +608,147 @@ export async function resetPassword(
     success: true,
     message:
       'Password reset successfully. You can now log in with your new password.',
+    correlationId,
+  })
+}
+
+// ─── Admin: list users ─────────────────────────────────────────
+const listUsersQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  search: z.string().trim().optional(),
+  status: z.enum(['all', 'blocked', 'active']).default('all'),
+  flagged: z.coerce.boolean().optional(),
+})
+
+export async function listUsers(
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> {
+  const correlationId = req.correlationId ?? uuidv4()
+  const parsed = listUsersQuerySchema.safeParse(req.query)
+  if (!parsed.success) {
+    res.status(400).json({
+      success: false,
+      error: 'Invalid query params',
+      details: parsed.error.flatten().fieldErrors,
+      correlationId,
+    })
+    return
+  }
+  const { page, limit, search, status, flagged } = parsed.data
+
+  const filter: Record<string, unknown> = {}
+  if (search) {
+    filter.$or = [
+      { email: { $regex: search, $options: 'i' } },
+      { fullName: { $regex: search, $options: 'i' } },
+    ]
+  }
+  if (status === 'blocked') filter.isBlocked = true
+  if (status === 'active') filter.isBlocked = false
+  if (typeof flagged === 'boolean') filter.flagged = flagged
+
+  const [users, total] = await Promise.all([
+    User.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit),
+    User.countDocuments(filter),
+  ])
+
+  res.json({
+    success: true,
+    data: {
+      users,
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    },
+    correlationId,
+  })
+}
+
+// ─── Admin: block user ─────────────────────────────────────────
+export async function blockUser(
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> {
+  const correlationId = req.correlationId ?? uuidv4()
+  const { id } = req.params
+  const { reason } = req.body as { reason?: string }
+
+  if (id === req.user!.sub) {
+    res.status(400).json({
+      success: false,
+      error: 'You cannot block your own account',
+      correlationId,
+    })
+    return
+  }
+
+  const target = await User.findById(id)
+  if (!target) {
+    res
+      .status(404)
+      .json({ success: false, error: 'User not found', correlationId })
+    return
+  }
+  if (target.role === 'admin') {
+    res.status(403).json({
+      success: false,
+      error: 'Admin accounts cannot be blocked',
+      correlationId,
+    })
+    return
+  }
+
+  target.isBlocked = true
+  target.blockedAt = new Date()
+  target.blockedReason = reason?.trim() || undefined
+  target.refreshTokens = []
+  await target.save()
+
+  await invalidateCache(cacheKeys.user(target.id))
+  logger.info(
+    { userId: target.id, byAdmin: req.user!.sub, reason },
+    'User blocked',
+  )
+
+  res.json({
+    success: true,
+    message: 'User blocked',
+    data: target,
+    correlationId,
+  })
+}
+
+// ─── Admin: unblock user ───────────────────────────────────────
+export async function unblockUser(
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> {
+  const correlationId = req.correlationId ?? uuidv4()
+  const { id } = req.params
+
+  const target = await User.findById(id)
+  if (!target) {
+    res
+      .status(404)
+      .json({ success: false, error: 'User not found', correlationId })
+    return
+  }
+
+  target.isBlocked = false
+  target.blockedAt = undefined
+  target.blockedReason = undefined
+  await target.save()
+
+  await invalidateCache(cacheKeys.user(target.id))
+  logger.info({ userId: target.id, byAdmin: req.user!.sub }, 'User unblocked')
+
+  res.json({
+    success: true,
+    message: 'User unblocked',
+    data: target,
     correlationId,
   })
 }

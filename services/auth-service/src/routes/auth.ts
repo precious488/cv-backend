@@ -65,8 +65,11 @@ import {
   toggleOtp,
   forgotPassword,
   resetPassword,
+  listUsers,
+  blockUser,
+  unblockUser,
 } from '../controllers/authController'
-import { authenticate } from '@craft/shared'
+import { authenticate, requireRole } from '@craft/shared'
 
 const router = Router()
 
@@ -112,5 +115,20 @@ router.put('/toggle-otp', authenticate, toggleOtp)
 // Password reset (public — no auth needed)
 router.post('/forgot-password', resetLimiter, forgotPassword)
 router.post('/reset-password', resetLimiter, resetPassword)
+
+// Admin — user management
+router.get('/admin/users', authenticate, requireRole('admin'), listUsers)
+router.put(
+  '/admin/users/:id/block',
+  authenticate,
+  requireRole('admin'),
+  blockUser,
+)
+router.put(
+  '/admin/users/:id/unblock',
+  authenticate,
+  requireRole('admin'),
+  unblockUser,
+)
 
 export default router
