@@ -239,15 +239,16 @@
 #       - source: 0.0.0.0/0
 #         description: allow all traffic
 services:
-  # ─── Redis ────────────────────────────────────────────────────
+   # ─── Redis ────────────────────────────────────────────────────
   - type: redis
     name: craft-redis
     region: oregon
     plan: free
     maxmemoryPolicy: allkeys-lru
-      ipAllowList:
-    - source: 0.0.0.0/0
-      description: allow all traffic
+    ipAllowList:
+      - source: "0.0.0.0/0"
+        description: "allow all traffic"      
+
 
   # ─── API Gateway ──────────────────────────────────────────────
   - type: web
